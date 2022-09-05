@@ -78,7 +78,7 @@ RUN cd /tmp &&\
     cd /tmp/lietorch &&\
     git apply /tmp/lietorch-sm86.diff &&\
     /opt/conda/bin/pip install -U \
-        numpy==1.22.2 scikit-learn &&\
+        numpy scikit-learn &&\
 #        opencv-python opencv-python-contrib opencv-python-headless &&\
     MAX_JOBS=32 /opt/conda/bin/python setup.py install &&\
     rm -rf /tmp/*
