@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+set -x
 set -e
 
 # Add a det-nobody user. Unlike the traditional nobody user, det-nobody will

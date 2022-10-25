@@ -34,6 +34,7 @@ RUN sed -i  "s/archive.ubuntu.com/mirrors.ustc.edu.cn/g" /etc/apt/sources.list &
 
 # Install Conda and Determined AI stuff
 #! ---EDIT notebook-requirements.txt TO ADD PYPI PACKAGES----
+COPY .condarc /root/.condarc
 ENV PATH="/opt/conda/bin:${PATH}"
 ENV PYTHONUNBUFFERED=1 PYTHONFAULTHANDLER=1 PYTHONHASHSEED=0
 ENV JUPYTER_CONFIG_DIR=/run/determined/jupyter/config
@@ -47,11 +48,10 @@ RUN /tmp/det_dockerfile_scripts/install_python.sh ${PYTHON_VERSION} &&\
     /tmp/det_dockerfile_scripts/install_libnss_determined.sh &&\
     rm -rf /tmp/*
 
-COPY .condarc /root/.condarc
 #! ----EDIT HERE TO INSTALL CONDA PACKAGES----
-# Example: pytorch w/ cuda 11.6
-# conda install pytorch torchvision torchaudio cudatoolkit=11.6 -c pytorch -c conda-forge
+# Example: PyTorch w/ cuda 11.6
+# RUN conda install pytorch torchvision torchaudio cudatoolkit=11.6 -c pytorch -c conda-forge
 # Example: Jax
-# conda install -c conda-forge jax
+# RUN conda install -c conda-forge jax
 # Example: OpenCV
-# conda install -c conda-forge opencv
+# RUN conda install -c conda-forge opencv
