@@ -1,4 +1,4 @@
-FROM determinedai/environments:cuda-11.3-pytorch-1.10-tf-2.8-gpu-0.19.4
+FROM determinedai/environments:cuda-11.3-pytorch-1.10-lightning-1.5-tf-2.8-gpu-0.18.5
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Shanghai LANG=C.UTF-8 LC_ALL=C.UTF-8 PIP_NO_CACHE_DIR=1
 ENV TORCH_CUDA_ARCH_LIST="8.6"
