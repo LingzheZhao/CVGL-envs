@@ -34,7 +34,7 @@ RUN sed -i  "s/archive.ubuntu.com/mirrors.ustc.edu.cn/g" /etc/apt/sources.list &
 
 # Install Conda and Determined AI stuff
 #! ---EDIT notebook-requirements.txt TO ADD PYPI PACKAGES----
-COPY .condarc /root/.condarc
+COPY .condarc /opt/conda/.condarc
 ENV PATH="/opt/conda/bin:${PATH}"
 ENV PYTHONUNBUFFERED=1 PYTHONFAULTHANDLER=1 PYTHONHASHSEED=0
 ENV JUPYTER_CONFIG_DIR=/run/determined/jupyter/config
