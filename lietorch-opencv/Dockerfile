@@ -1,7 +1,7 @@
 FROM determinedai/environments:cuda-11.3-pytorch-1.10-lightning-1.5-tf-2.8-deepspeed-0.5.10-gpu-0.18.2
 ARG DEBIAN_FRONTEND=noninteractive
 ARG OPENCV_VERSION=4.6.0
-ENV TZ=Asia/Shanghai LANG=C.UTF-8 LC_ALL=C.UTF-8 PIP_NO_CACHE_DIR=1
+ENV TZ=Asia/Shanghai LANG=C.UTF-8 LC_ALL=C.UTF-8 PIP_NO_CACHE_DIR=1 MAX_JOBS=48
 
 RUN sed -i  "s/archive.ubuntu.com/mirrors.ustc.edu.cn/g" /etc/apt/sources.list &&\
     sed -i  "s/security.ubuntu.com/mirrors.ustc.edu.cn/g" /etc/apt/sources.list &&\
@@ -29,13 +29,9 @@ RUN sed -i  "s/archive.ubuntu.com/mirrors.ustc.edu.cn/g" /etc/apt/sources.list &
         libgstreamer1.0-dev libgstreamer-plugins-base1.0-dev \
         python3-dev python3-pip python3-numpy python3-testresources &&\
     apt-get clean &&\
-    conda config --set show_channel_urls yes &&\
-    conda config --add channels https://mirrors.ustc.edu.cn/anaconda/pkgs/free/ &&\
-    conda config --add channels https://mirrors.ustc.edu.cn/anaconda/pkgs/main/ &&\
-    conda config --add channels https://mirrors.ustc.edu.cn/anaconda/cloud/conda-forge/ &&\
-    conda config --add channels https://mirrors.ustc.edu.cn/anaconda/cloud/msys2/ &&\
-    conda config --add channels https://mirrors.ustc.edu.cn/anaconda/cloud/bioconda/ &&\
-    conda config --add channels https://mirrors.ustc.edu.cn/anaconda/cloud/menpo/
+    rm -rf /var/lib/apt/lists/*
+
+COPY .condarc /opt/conda/.condarc
 
 # Install OpenCV
 RUN cd /tmp/ &&\
@@ -79,6 +75,5 @@ RUN cd /tmp &&\
     git apply /tmp/lietorch-sm86.diff &&\
     /opt/conda/bin/pip install -U \
         numpy scikit-learn &&\
-#        opencv-python opencv-python-contrib opencv-python-headless &&\
-    MAX_JOBS=32 /opt/conda/bin/python setup.py install &&\
+    /opt/conda/bin/python setup.py install &&\
     rm -rf /tmp/*
