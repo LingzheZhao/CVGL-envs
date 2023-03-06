@@ -6,8 +6,9 @@ set -e
 PYTHON_VERSION=${1}
 
 CONDA_DIR="/opt/conda"
-CONDA_INSTALLER="Miniconda3-py37_4.12.0-Linux-x86_64.sh"
-CONDA_MD5="770bac2587bc7380198b4f0741115b11"
+CONDA_INSTALLER="Miniconda3-py39_4.11.0-Linux-x86_64.sh"
+CONDA_MD5="4e2f31e0b2598634c80daa12e4981647"
+#CONDA_URL="https://repo.anaconda.com/miniconda"
 CONDA_URL="https://mirrors.bfsu.edu.cn/anaconda/miniconda/"
 
 mkdir -p /etc/determined/conda.d

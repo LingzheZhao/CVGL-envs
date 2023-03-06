@@ -1,5 +1,5 @@
-FROM nvcr.io/nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
-ARG PYTHON_VERSION=3.8.15
+FROM nvcr.io/nvidia/pytorch:23.01-py3
+
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Shanghai LANG=C.UTF-8 LC_ALL=C.UTF-8 PIP_NO_CACHE_DIR=1
 
@@ -32,25 +32,19 @@ RUN sed -i  "s/archive.ubuntu.com/mirrors.ustc.edu.cn/g" /etc/apt/sources.list &
     && rm -rf /var/lib/apt/lists/*
 
 # Install Conda and Determined AI stuff
-#! ---EDIT notebook-requirements.txt TO ADD PYPI PACKAGES----
 COPY .condarc /opt/conda/.condarc
 ENV PATH="/opt/conda/bin:${PATH}"
 ENV PYTHONUNBUFFERED=1 PYTHONFAULTHANDLER=1 PYTHONHASHSEED=0
 ENV JUPYTER_CONFIG_DIR=/run/determined/jupyter/config
 ENV JUPYTER_DATA_DIR=/run/determined/jupyter/data
 ENV JUPYTER_RUNTIME_DIR=/run/determined/jupyter/runtime
-RUN /tmp/det_dockerfile_scripts/install_python.sh ${PYTHON_VERSION} &&\
-    pip config set global.index-url https://mirrors.bfsu.edu.cn/pypi/web/simple &&\
+RUN pip config set global.index-url https://mirrors.bfsu.edu.cn/pypi/web/simple &&\
+    pip install -U pip &&\
     pip install determined && pip uninstall -y determined &&\
     pip install -r /tmp/det_dockerfile_scripts/notebook-requirements.txt &&\
+    # Dependencies
+    pip install "imageio[ffmpeg]" &&\
+    pip install scikit-image lpips configargparse &&\
     /tmp/det_dockerfile_scripts/add_det_nobody_user.sh &&\
     /tmp/det_dockerfile_scripts/install_libnss_determined.sh &&\
     rm -rf /tmp/*
-
-#! ----EDIT HERE TO INSTALL CONDA PACKAGES----
-# Example: PyTorch w/ cuda 11.6
-# RUN conda install pytorch torchvision torchaudio cudatoolkit=11.6 -c pytorch -c conda-forge
-# Example: Jax
-# RUN conda install -c conda-forge jax
-# Example: OpenCV
-# RUN conda install -c conda-forge opencv

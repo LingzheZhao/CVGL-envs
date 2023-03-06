@@ -1,5 +1,5 @@
 FROM colmap/colmap:latest
-ARG PYTHON_VERSION=3.8
+ARG PYTHON_VERSION=3.8.15
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Shanghai LANG=C.UTF-8 LC_ALL=C.UTF-8 PIP_NO_CACHE_DIR=1
 RUN rm /etc/apt/sources.list.d/cuda.list &&\
