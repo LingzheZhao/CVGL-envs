@@ -1,12 +1,12 @@
 FROM nvcr.io/nvidia/cudagl:11.4.2-devel-ubuntu20.04
 ARG EIGEN_VERSION=3.4.0
-ARG OPENCV_VERSION=4.5.5
+ARG OPENCV_VERSION=4.7.0
 ARG PYTHON_VERSION=3.8.15
 ARG CERES_VERSION=2.1.0
 ARG FMT_VERSION=8.1.1
 ARG VTK_VERSION=9.1
 ARG VTK_SUB_VERSION=9.1.0
-ARG OPENEXR_VERSION=3.1.5
+ARG OPENEXR_VERSION=3.1.7
 ARG ABSEIL_VERSION=20211102.0
 ARG MRPT_VERSION=2.5.4
 ARG CLANG_VER=12
@@ -127,7 +127,7 @@ RUN cd /tmp &&\
     wget http://ceres-solver.org/ceres-solver-${CERES_VERSION}.tar.gz &&\
     tar -xvzf ceres-solver-${CERES_VERSION}.tar.gz &&\
     cd ceres-solver-${CERES_VERSION} &&\
-    cmake -B build -GNinja -DCMAKE_BUILD_TYPE=RELEASE &&\
+    cmake -B build -GNinja -DCMAKE_BUILD_TYPE=RELEASE -DBUILD_TESTING=OFF -DBUILD_EXAMPLES=OFF &&\
     cmake --build build -t install &&\
     ldconfig && rm -rf /tmp/*
 
@@ -168,7 +168,7 @@ RUN cd /tmp/ &&\
         -DOPENCV_EXTRA_MODULES_PATH=/tmp/opencv_contrib-${OPENCV_VERSION}/modules \
         -DOPENCV_ENABLE_NONFREE=ON \
         -DWITH_CUDA=ON \
-        -DCUDA_ARCH_BIN=8.6 \
+        -DCUDA_ARCH_BIN=8.9 \
         -DCMAKE_BUILD_TYPE=RELEASE \
         -DCMAKE_INSTALL_PREFIX=/usr/local &&\
     cmake --build build -t install &&\

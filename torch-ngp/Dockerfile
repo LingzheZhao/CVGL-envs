@@ -1,11 +1,7 @@
-FROM nvcr.io/nvidia/cuda:11.8.0-cudnn8-devel-ubuntu20.04
-ARG PYTHON_VERSION=3.8.15
+FROM nvcr.io/nvidia/pytorch:23.04-py3
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Shanghai LANG=C.UTF-8 LC_ALL=C.UTF-8 PIP_NO_CACHE_DIR=1
 
-COPY dockerfile_scripts /tmp/det_dockerfile_scripts
-
-# Install apt packages
 RUN sed -i  "s/archive.ubuntu.com/mirrors.ustc.edu.cn/g" /etc/apt/sources.list &&\
     sed -i  "s/security.ubuntu.com/mirrors.ustc.edu.cn/g" /etc/apt/sources.list &&\
     rm -f /etc/apt/sources.list.d/* &&\
@@ -21,6 +17,8 @@ RUN sed -i  "s/archive.ubuntu.com/mirrors.ustc.edu.cn/g" /etc/apt/sources.list &
         ## Tools
         git curl wget unzip nano net-tools htop iotop \
         cloc rsync xz-utils software-properties-common \
+        ffmpeg \
+        python3-tk \
     && rm /etc/ssh/ssh_host_ecdsa_key \
     && rm /etc/ssh/ssh_host_ed25519_key \
     && rm /etc/ssh/ssh_host_rsa_key \
@@ -32,25 +30,28 @@ RUN sed -i  "s/archive.ubuntu.com/mirrors.ustc.edu.cn/g" /etc/apt/sources.list &
     && rm -rf /var/lib/apt/lists/*
 
 # Install Conda and Determined AI stuff
-#! ---EDIT notebook-requirements.txt TO ADD PYPI PACKAGES----
-COPY .condarc /opt/conda/.condarc
-ENV PATH="/opt/conda/bin:${PATH}"
+WORKDIR /tmp
 ENV PYTHONUNBUFFERED=1 PYTHONFAULTHANDLER=1 PYTHONHASHSEED=0
 ENV JUPYTER_CONFIG_DIR=/run/determined/jupyter/config
 ENV JUPYTER_DATA_DIR=/run/determined/jupyter/data
 ENV JUPYTER_RUNTIME_DIR=/run/determined/jupyter/runtime
-RUN /tmp/det_dockerfile_scripts/install_python.sh ${PYTHON_VERSION} &&\
+RUN git clone https://github.com/LingzheZhao/determinedai-container-scripts &&\
+    cd determinedai-container-scripts &&\
+    git checkout v0.1 &&\
     pip config set global.index-url https://mirrors.bfsu.edu.cn/pypi/web/simple &&\
     pip install determined && pip uninstall -y determined &&\
-    pip install -r /tmp/det_dockerfile_scripts/notebook-requirements.txt &&\
-    /tmp/det_dockerfile_scripts/add_det_nobody_user.sh &&\
-    /tmp/det_dockerfile_scripts/install_libnss_determined.sh &&\
+    pip install -r notebook-requirements.txt &&\
+    pip install -r additional-requirements.txt &&\
+    ./add_det_nobody_user.sh &&\
+    ./install_libnss_determined.sh &&\
     rm -rf /tmp/*
 
-#! ----EDIT HERE TO INSTALL CONDA PACKAGES----
-# Example: PyTorch w/ cuda 11.6
-# RUN conda install pytorch torchvision torchaudio cudatoolkit=11.6 -c pytorch -c conda-forge
-# Example: Jax
-# RUN conda install -c conda-forge jax
-# Example: OpenCV
-# RUN conda install -c conda-forge opencv
+ENV TORCH_CUDA_ARCH_LIST="8.6;8.9" TCNN_CUDA_ARCHITECTURES="86;89"
+ARG MAX_JOBS 16
+RUN git clone https://github.com/ashawkey/torch-ngp &&\
+    cd torch-ngp &&\
+    sed -i -e '/^torch$/d' requirements.txt &&\
+    pip install -r requirements.txt &&\
+    pip install git+https://github.com/NVlabs/tiny-cuda-nn/#subdirectory=bindings/torch &&\
+    bash scripts/install_ext.sh &&\
+    rm -rf /tmp/*
